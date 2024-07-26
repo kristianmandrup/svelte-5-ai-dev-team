@@ -28,7 +28,7 @@
 
 	<ul class="project-list">
 		{#each data.projects as project}
-			<li class="project-item">{project.name}</li>
+			<li class="project-item"><a href="/projects/{project.id}">{project.name}</a></li>
 		{/each}
 	</ul>
 

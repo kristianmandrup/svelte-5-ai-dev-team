@@ -17,6 +17,10 @@ export class Organization extends Storable {
 		this.backlog = new Backlog();
 	}
 
+	project(id: string) {
+		return this.projects[id];
+	}
+
 	addProject(project: Project) {
 		this.projects[project.name] = project;
 	}

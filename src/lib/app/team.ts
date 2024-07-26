@@ -4,7 +4,10 @@ import type { Member } from './member';
 import { Project } from './project';
 
 export class Team extends Storage {
+	id: string;
 	name: string;
+	description?: string;
+
 	storeName: string;
 	members: Record<string, Member> = {};
 	backlog: Backlog;
@@ -13,13 +16,23 @@ export class Team extends Storage {
 		return new Project(name);
 	}
 
-	constructor(name: string) {
+	constructor(name: string, description?: string) {
 		super();
+		this.id = crypto.randomUUID().slice(0, 6);
 		this.name = name;
+		this.description = description;
 		this.storeName = `${name}@team`;
 		this.stores['members'] = createMemberStore();
 		this.stores[this.storeName] = createTeamStore(this.storeName);
 		this.backlog = new Backlog();
+	}
+
+	serialize() {
+		return {
+			id: this.id,
+			name: this.name,
+			description: this.description
+		};
 	}
 
 	addMember(member: Member) {
