@@ -97,6 +97,21 @@ Next step will be to generate actual JSON Project CRUD event messages:
 }
 ```
 
+The latest version now generates such JSON event messages.
+
+## App model
+
+There is now an application model with stores in `src/lib/server/app`. This model can be used to store, maintain and reference application state.
+
+````ts
+import { app } from '$lib/server/app';
+import { produce } from 'sveltekit-sse';
+
+const projectStore = app.organization.stores['project'];
+```
+
+Using this approach ensures that the correct store is only created once and referenced/shared everywhere it is used to ensure data consistency in the application.
+
 ## Notes on SSE integration
 
 SvelteKit now supports SSE natively, as demonstrated in [ReadableStream for SSE](https://github.com/sveltejs/kit/issues/5344#issuecomment-1266398131) and [Full example](https://github.com/sveltejs/kit/issues/5344#issuecomment-2191106238)
@@ -125,7 +140,7 @@ graph LR
 
     B -->|Updates| B
     D -->|Updates| D
-```
+````
 
 ## TODO
 
