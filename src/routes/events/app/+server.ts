@@ -1,7 +1,9 @@
-import { app } from '$lib/server/app';
+import { app } from '$lib/app/app';
 import { produce } from 'sveltekit-sse';
 
-const projectStore = app.organization.stores['project'];
+console.log(app.organization.projectStore);
+
+const projectStore = app.organization.projectStore; //stores['project'];
 
 export function POST() {
 	return produce(async function start({ emit }) {
@@ -43,9 +45,9 @@ const messages = [
 	remove(names[2])
 ];
 
-// setInterval(() => {
-// 	projectStore.add('hello: ' + crypto.randomUUID());
-// }, 4000);
+setInterval(() => {
+	projectStore.add('hello: ' + crypto.randomUUID());
+}, 4000);
 
 setInterval(() => {
 	const msg = messages.shift();

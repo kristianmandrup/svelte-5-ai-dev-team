@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { source } from 'sveltekit-sse';
+	import type { PageData } from './$types';
+
+	// Access the loaded data using $props
+	const { data } = $props<{ data: PageData }>();
 
 	const connection = source('/events/app');
 	const channel = connection.select('project');
@@ -21,6 +25,13 @@
 
 <div>
 	<h1>Projects</h1>
+
+	<ul class="project-list">
+		{#each data.projects as project}
+			<li class="project-item">{project.name}</li>
+		{/each}
+	</ul>
+
 	<h2>Messages</h2>
 	{#if messages.length === 0}
 		<p>No messages yet.</p>
