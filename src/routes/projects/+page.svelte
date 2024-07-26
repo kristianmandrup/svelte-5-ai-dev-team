@@ -8,8 +8,11 @@
 	let intervalId: any;
 
 	async function fetchMessages() {
+		console.log('fetch messages');
 		const response = await fetch(`/api/messages?channel=${channelName}`);
+		console.log({ response });
 		const data = await response.json();
+		console.log('data');
 		messageStore.set(data.messages);
 	}
 

@@ -30,10 +30,7 @@ export class RedisStore {
 
 			this.pubsub.on('message', (receivedChannel: string, message: string) => {
 				if (receivedChannel === this.channel) {
-					this.messages = [...this.messages, message];
-					if (this.callback) {
-						this.callback(this.messages, message);
-					}
+					this.add(message);
 				}
 			});
 		} catch (error) {
@@ -43,6 +40,7 @@ export class RedisStore {
 	}
 
 	public subscribe(callback: subscribeFn) {
+		console.log('subscribed to', this.channel);
 		this.callback = callback;
 	}
 
@@ -55,7 +53,12 @@ export class RedisStore {
 	}
 
 	public add(message: string) {
+		console.log('add message to store', message);
 		this.messages = [...this.messages, message];
+		console.log('call callback with store data');
+		if (this.callback) {
+			this.callback(this.messages, message);
+		}
 	}
 
 	public reset() {

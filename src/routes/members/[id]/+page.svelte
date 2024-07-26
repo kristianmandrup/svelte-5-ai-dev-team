@@ -3,7 +3,7 @@
 </script>
 
 <div>
-	<h1>Member ${id}</h1>
+	<h1>Member</h1>
 	{#if messages.length === 0}
 		<p>No messages yet.</p>
 	{:else}

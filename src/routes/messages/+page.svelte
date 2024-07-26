@@ -7,13 +7,19 @@
 	let messages = writable<string[]>([]);
 
 	async function fetchMessages() {
+		console.log('fetch messages', channelName);
 		const response = await fetch(`/api/messages?channel=${channelName}`);
+		console.log({ response });
 		const data = await response.json();
 		messages.set(data.messages);
 	}
 
 	async function postMessage() {
-		if (newMessage.trim() === '') return;
+		console.log('post message');
+		if (newMessage.trim() === '') {
+			console.log('empty message');
+			return;
+		}
 		const response = await fetch('/api/messages', {
 			method: 'POST',
 			headers: {
@@ -21,6 +27,7 @@
 			},
 			body: JSON.stringify({ message: newMessage })
 		});
+		console.log('Post response', response);
 		const data = await response.json();
 		if (response.ok) {
 			console.log('Message added:', data.message);
@@ -41,7 +48,7 @@
 
 	<div class="form-container">
 		<input type="text" bind:value={newMessage} placeholder="Enter new message" />
-		<button on:click={postMessage}>Post Message</button>
+		<button on:click={postMessage} class="rounded-md bg-gray-300 p-1">Post Message</button>
 	</div>
 
 	<div class="messages-container">
@@ -60,6 +67,10 @@
 <style>
 	.form-container {
 		margin-bottom: 1rem;
+	}
+
+	button {
+		margin: 1px solid;
 	}
 
 	.messages-container {

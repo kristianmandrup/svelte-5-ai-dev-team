@@ -5,10 +5,11 @@ import { createProjectStore } from '$lib/server/redis';
 const projectStore = createProjectStore();
 
 export const GET: RequestHandler = async ({ url }) => {
+	console.log('GET', { url });
 	const channelName = url.searchParams.get('channel') || 'default';
 	const messages = await new Promise<string[]>((resolve) => {
 		const onMessages = (messages: string[], newMessage: string) => {
-			console.log(newMessage);
+			console.log('subscribed channel', { newMessage });
 			resolve(messages);
 		};
 		projectStore.subscribe(onMessages);
@@ -24,6 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: 'Message content is required' }, { status: 400 });
 	}
 
+	console.log('add', message);
 	projectStore.add(message);
 
 	return json({ status: 'success', message });
