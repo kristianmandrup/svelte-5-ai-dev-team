@@ -7,7 +7,7 @@ export class RedisStore {
 	private channel: string;
 	private isConnected = false;
 	private messages = $state<string[]>([]);
-	private callback?: subscribeFn;
+	private callbacks: Record<string, subscribeFn> = {};
 
 	constructor(pubsub: Redis, channel: string) {
 		this.pubsub = pubsub;
@@ -39,9 +39,9 @@ export class RedisStore {
 		}
 	}
 
-	public subscribe(callback: subscribeFn) {
-		console.log('subscribed to', this.channel);
-		this.callback = callback;
+	public subscribe(name: string, callback: subscribeFn) {
+		console.log('subscribed to', { name, channel: this.channel });
+		this.callbacks[name] = callback;
 	}
 
 	public unsubscribe() {
@@ -56,8 +56,12 @@ export class RedisStore {
 		console.log('add message to store', message);
 		this.messages = [...this.messages, message];
 		console.log('call callback with store data');
-		if (this.callback) {
-			this.callback(this.messages, message);
+		const names = Object.keys(this.callbacks);
+		console.log({ names });
+		for (const name of names) {
+			const callback = this.callbacks[name];
+			console.log('calling callback', { name, message });
+			callback(this.messages, message);
 		}
 	}
 

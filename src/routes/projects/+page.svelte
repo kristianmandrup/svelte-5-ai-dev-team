@@ -1,44 +1,33 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { messageStore } from '$lib/stores/messages';
+	import { source } from 'sveltekit-sse';
 
-	export let channelName = 'default';
+	const connection = source('/events/app');
+	const channel = connection.select('project');
 
-	let messages: string[] = [];
-	let intervalId: any;
-
-	async function fetchMessages() {
-		console.log('fetch messages');
-		const response = await fetch(`/api/messages?channel=${channelName}`);
-		console.log({ response });
-		const data = await response.json();
-		console.log('data');
-		messageStore.set(data.messages);
-	}
-
-	onMount(() => {
-		fetchMessages();
-		intervalId = setInterval(fetchMessages, 5000); // Poll every 5 seconds
+	const transformed = channel.transform(function run(data) {
+		if (data === '') return;
+		// TODO: parse json
+		return `transformed: ${data}`;
 	});
 
-	onDestroy(() => {
-		if (intervalId) clearInterval(intervalId);
-		messageStore.reset();
-	});
+	let messages = $state<string[]>([]);
 
-	messageStore.subscribe((value) => {
-		messages = value;
+	transformed.subscribe((value: string) => {
+		if (value) {
+			messages = [...messages, value];
+		}
 	});
 </script>
 
 <div>
-	<h2>{channelName} Messages</h2>
+	<h1>Projects</h1>
+	<h2>Messages</h2>
 	{#if messages.length === 0}
 		<p>No messages yet.</p>
 	{:else}
 		<ul>
 			{#each messages as message}
-				<li>{message}</li>
+				<li>message: {message}</li>
 			{/each}
 		</ul>
 	{/if}

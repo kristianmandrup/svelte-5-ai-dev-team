@@ -2,19 +2,19 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createProjectStore } from '$lib/server/redis';
 
-const projectStore = createProjectStore();
+const projectStore = createProjectStore('GET');
 
 export const GET: RequestHandler = async ({ url }) => {
-	console.log('GET', { url });
+	console.log('GET', url.href);
 	const channelName = url.searchParams.get('channel') || 'default';
 	const messages = await new Promise<string[]>((resolve) => {
 		const onMessages = (messages: string[], newMessage: string) => {
-			console.log('subscribed channel', { newMessage });
+			console.log('GET onMessages triggered', { newMessage });
 			resolve(messages);
 		};
-		projectStore.subscribe(onMessages);
+		projectStore.subscribe(`GET:${channelName}`, onMessages);
 	});
-
+	console.log('GET: return json', messages, channelName);
 	return json({ messages, channelName });
 };
 

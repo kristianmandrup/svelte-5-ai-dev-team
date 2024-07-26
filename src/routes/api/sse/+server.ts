@@ -2,7 +2,7 @@
 import { createProjectStore } from '$lib/server/redis';
 import type { RequestHandler } from '@sveltejs/kit';
 
-const projectStore = createProjectStore();
+const projectStore = createProjectStore('Old SSE');
 
 export const GET: RequestHandler = async ({ url }) => {
 	const channelName = url.searchParams.get('channel') || 'default';
@@ -10,11 +10,13 @@ export const GET: RequestHandler = async ({ url }) => {
 	const stream = new ReadableStream({
 		start(controller) {
 			const onMessages = (messages: string[], newMessage: string) => {
+				console.log('received', { messages, newMessage });
 				const data = `data: ${JSON.stringify({ messages, newMessage, channelName })}\n\n`;
+				console.log('enqueue', data);
 				controller.enqueue(new TextEncoder().encode(data));
 			};
 
-			projectStore.subscribe(onMessages);
+			projectStore.subscribe(`stream:${channelName}`, onMessages);
 		},
 		cancel() {
 			projectStore.unsubscribe();

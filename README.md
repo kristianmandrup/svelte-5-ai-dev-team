@@ -73,6 +73,30 @@ async function addMessage(message) {
 addMessage('Hello, World!');
 ```
 
+## Status
+
+The `api` branch contains a number of changes and fixes. Note that the `/time` route is now working with SSE.
+This `projects' route also works with SSE project messages being generated and sent from the server :)
+
+```ts
+setInterval(() => {
+	projectStore.add('hello: ' + crypto.randomUUID());
+}, 4000);
+```
+
+Next step will be to generate actual JSON Project CRUD event messages:
+
+```js
+{
+    model: 'project',
+    event: 'create'
+    payload: {
+        name: 'my project',
+        description: 'my project description ...'
+    }
+}
+```
+
 ## Notes on SSE integration
 
 SvelteKit now supports SSE natively, as demonstrated in [ReadableStream for SSE](https://github.com/sveltejs/kit/issues/5344#issuecomment-1266398131) and [Full example](https://github.com/sveltejs/kit/issues/5344#issuecomment-2191106238)
