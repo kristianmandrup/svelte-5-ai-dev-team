@@ -1,7 +1,8 @@
 import { app } from '$lib/app/app';
+import type { Project } from '$lib/app/project.js';
 
 export const load = async ({ params }) => {
-	const project = app.organization.project(params.id);
+	const project: Project = app.organization.project(params.id);
 	if (project) {
 		const { name, description } = project;
 		const teams = project.teams;

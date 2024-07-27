@@ -22,7 +22,11 @@ export class Organization extends Storable {
 	}
 
 	project(id: string) {
-		return this.projects.get(id);
+		return this.projects.get(id) || this.projectByName(id);
+	}
+
+	projectByName(name: string) {
+		return Object.values(this.projects).find((p) => p.name === name);
 	}
 
 	addProject(project: Project) {

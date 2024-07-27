@@ -15,6 +15,13 @@
 		return `${data}`;
 	});
 
+	$effect(() => {
+		if (!data) return;
+		messages = [...messages, ...data];
+		projects = [...projects, ...data];
+	});
+
+	let projects = $state<ProjectPayload[]>([]);
 	let messages = $state<string[]>([]);
 	let lastMessage = $state<string>('');
 
@@ -22,6 +29,8 @@
 		if (value) {
 			messages = [...messages, value];
 			lastMessage = value;
+			const project = JSON.parse(value).payload;
+			projects = [...projects, project];
 		}
 	});
 
@@ -58,6 +67,7 @@
 	}
 
 	import { getToastState } from '$lib/toast-state.svelte';
+	import type { ProjectPayload } from '$lib/app/events/project.events';
 
 	const toastState = getToastState();
 
@@ -89,8 +99,8 @@
 	<h1>Projects</h1>
 
 	<ul class="project-list">
-		{#each data.projects as project}
-			<li class="project-item"><a href="/projects/{project.id}">{project.name}</a></li>
+		{#each projects as project}
+			<li class="project-item"><a href="/projects/{project.name}">{project.name}</a></li>
 		{/each}
 	</ul>
 

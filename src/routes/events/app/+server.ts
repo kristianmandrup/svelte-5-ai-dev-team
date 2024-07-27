@@ -4,6 +4,7 @@ import type { AppEventHandler } from '$lib/app/events/handlers/event.handler';
 import { projectEventHandler } from '$lib/app/events/handlers/project.event.handler';
 import { teamEventHandler } from '$lib/app/events/handlers/team.event.handler';
 import { produce } from 'sveltekit-sse';
+import { faker } from '@faker-js/faker';
 
 console.log(app.organization.projectStore);
 
@@ -49,7 +50,7 @@ const add = (name: string) => ({
 	action: 'add',
 	payload: {
 		name,
-		description: 'my project description ...'
+		description: faker.lorem.paragraph
 	}
 });
 
