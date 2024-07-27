@@ -79,7 +79,7 @@ export class RedisStore {
 	public addObj(obj: unknown) {
 		console.log('addObj', obj);
 		const message = JSON.stringify(obj);
-		console.log('stringified message', message);
+		// console.log('stringified message', message);
 		this.add(message);
 	}
 

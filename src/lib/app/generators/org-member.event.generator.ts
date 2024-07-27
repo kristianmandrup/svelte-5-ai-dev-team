@@ -3,11 +3,11 @@ import type { ActionEvent } from '../events/event';
 import { app } from '../app';
 import type { TeamMemberPayload } from '../events/member.events';
 
-const names = ['Jack', 'Willy', 'Maria'];
+const names = ['Allan', 'Carol', 'Michael'];
 
 const add = (name: string): ActionEvent => ({
 	source: 'generator',
-	model: 'team-member',
+	model: 'member',
 	action: 'add',
 	payload: {
 		name,
@@ -17,7 +17,7 @@ const add = (name: string): ActionEvent => ({
 
 const remove = (name: string): ActionEvent => ({
 	source: 'generator',
-	model: 'team-member',
+	model: 'member',
 	action: 'remove',
 	payload: {
 		name
@@ -35,7 +35,7 @@ const eventLog = [
 
 const getRandom = (items: string[]): string => items[Math.floor(Math.random() * items.length)];
 
-export const generateTeamMemberEvents = () => {
+export const generateMemberEvents = () => {
 	setInterval(() => {
 		const teamIds: string[] = app.organization.teamList.map((team) => team.id);
 		const event: ActionEvent | undefined = eventLog.shift();
@@ -43,11 +43,6 @@ export const generateTeamMemberEvents = () => {
 		const teamId = getRandom(teamIds);
 		const payload = event.payload as TeamMemberPayload;
 		payload.teamId = teamId;
-		const team = app.organization.team(teamId);
-		if (!team) {
-			console.error(`No team: ${teamId}`);
-			return;
-		}
-		team.memberStore.addObj(event);
-	}, 4000);
+		app.organization.memberStore.addObj(event);
+	}, 2400);
 };

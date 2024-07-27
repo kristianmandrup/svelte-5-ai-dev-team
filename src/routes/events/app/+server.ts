@@ -1,9 +1,11 @@
 import { app } from '$lib/app/app';
 import type { ActionEvent } from '$lib/app/events/event';
+import { memberEventHandler } from '$lib/app/events/handlers';
 import type { ActionEventHandler } from '$lib/app/events/handlers/event.handler';
 import { projectEventHandler } from '$lib/app/events/handlers/project.event.handler';
 import { teamMemberEventHandler } from '$lib/app/events/handlers/team-member.event.handler';
 import { teamEventHandler } from '$lib/app/events/handlers/team.event.handler';
+import { generateMemberEvents } from '$lib/app/generators';
 import { generateProjectEvents } from '$lib/app/generators/project.event.generator';
 import { generateTeamMemberEvents } from '$lib/app/generators/team-member.event.generator';
 import { generateTeamEvents } from '$lib/app/generators/team.event.generator';
@@ -14,7 +16,8 @@ const appEventStore = app.appEvents;
 const eventHandlers = new Map<string, ActionEventHandler>();
 eventHandlers.set('project', projectEventHandler);
 eventHandlers.set('team', teamEventHandler);
-eventHandlers.set('member', teamMemberEventHandler);
+eventHandlers.set('team-member', teamMemberEventHandler);
+eventHandlers.set('member', memberEventHandler);
 
 const onActionEvents = (messages: string[], newMessage: string) => {
 	try {
@@ -65,3 +68,4 @@ export function POST() {
 generateProjectEvents();
 generateTeamEvents();
 generateTeamMemberEvents();
+generateMemberEvents();
