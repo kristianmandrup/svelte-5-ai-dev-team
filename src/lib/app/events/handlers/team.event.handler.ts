@@ -1,10 +1,10 @@
 import { Team } from '$lib/app/team';
-import type { AppEvent } from '../event';
+import type { ActionEvent } from '../event';
 import type { AddTeamPayload, RemoveTeamPayload } from '../team.events';
-import { AppEventHandler } from './event.handler';
+import { ActionEventHandler } from './event.handler';
 
-export class TeamEventHandler extends AppEventHandler {
-	process(event: AppEvent) {
+export class TeamEventHandler extends ActionEventHandler {
+	process(event: ActionEvent) {
 		switch (event.action) {
 			case 'add':
 				return this.onAddTeam(event);
@@ -19,7 +19,7 @@ export class TeamEventHandler extends AppEventHandler {
 		return this.organization.projects.get(id);
 	}
 
-	onAddTeam = (event: AppEvent) => {
+	onAddTeam = (event: ActionEvent) => {
 		const payload = event.payload as AddTeamPayload;
 		const { name, description, projectId } = payload;
 		const project = this.getProject(projectId);
@@ -28,7 +28,7 @@ export class TeamEventHandler extends AppEventHandler {
 		project.addTeam(team);
 	};
 
-	onRemoveTeam = (event: AppEvent) => {
+	onRemoveTeam = (event: ActionEvent) => {
 		const payload = event.payload as RemoveTeamPayload;
 		const { name, projectId } = payload;
 		const project = this.getProject(projectId);

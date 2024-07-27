@@ -5,6 +5,7 @@ import { Project } from './project';
 import { Storable } from './storable';
 
 export class Team extends Storable {
+	model = 'team';
 	id: string;
 	name: string;
 	description?: string;

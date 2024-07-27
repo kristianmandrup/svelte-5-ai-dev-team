@@ -29,7 +29,16 @@
 		if (value) {
 			messages = [...messages, value];
 			lastMessage = value;
-			const project = JSON.parse(value).payload;
+			const json = JSON.parse(value);
+			console.log('unpacked', json);
+			const { source, model, action, data } = json;
+			if (model !== 'project') {
+				console.log('not a project event');
+				return;
+			}
+			console.log('event', { source, model, action });
+			const project = data;
+			// TODO: depending on the event, add, remove or update the project
 			projects = [...projects, project];
 		}
 	});
@@ -78,10 +87,13 @@
 		if (!message) return;
 
 		const json = JSON.parse(message);
-		const { payload } = json;
-		const { name, description } = payload;
+		const { data } = json;
+		if (!data) {
+			console.error('missing data', json);
+		}
+		const { name, description } = data;
 		if (!name) {
-			console.log('missing name', payload);
+			console.log('missing name', data);
 			return;
 		}
 		// already processed
@@ -89,7 +101,7 @@
 			console.log('already made toast for', name);
 			return;
 		}
-		toastMap.set(name, payload);
+		toastMap.set(name, data);
 		console.log('toast message', name);
 		toastState.add(name, description);
 	});

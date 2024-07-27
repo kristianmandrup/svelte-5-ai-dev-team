@@ -1,23 +1,22 @@
 import { app } from '$lib/app/app';
-import type { AppEvent } from '$lib/app/events/event';
-import type { AppEventHandler } from '$lib/app/events/handlers/event.handler';
+import type { ActionEvent } from '$lib/app/events/event';
+import type { ActionEventHandler } from '$lib/app/events/handlers/event.handler';
 import { projectEventHandler } from '$lib/app/events/handlers/project.event.handler';
 import { teamEventHandler } from '$lib/app/events/handlers/team.event.handler';
 import { produce } from 'sveltekit-sse';
 import { faker } from '@faker-js/faker';
 
-console.log(app.organization.projectStore);
-
 const projectStore = app.organization.projectStore; //stores['project'];
+const appEventStore = app.appEvents;
 
-const eventHandlers = new Map<string, AppEventHandler>();
+const eventHandlers = new Map<string, ActionEventHandler>();
 eventHandlers.set('project', projectEventHandler);
 eventHandlers.set('team', teamEventHandler);
 
-const onAppMessages = (messages: string[], newMessage: string) => {
+const onActionEvents = (messages: string[], newMessage: string) => {
 	try {
 		const json = JSON.parse(newMessage);
-		const event = json as AppEvent;
+		const event = json as ActionEvent;
 		const { model } = event;
 		const handler = eventHandlers.get(model);
 		if (!handler) {
@@ -29,32 +28,50 @@ const onAppMessages = (messages: string[], newMessage: string) => {
 	}
 };
 
-projectStore.subscribe('app', onAppMessages);
+projectStore.subscribe('app', onActionEvents);
 
 export function POST() {
 	return produce(async function start({ emit }) {
 		console.log('produce app messages');
 		const onMessages = (messages: string[], newMessage: string) => {
-			console.log('received', { messages, newMessage });
-			console.log('emit:project', newMessage);
-			emit('project', newMessage);
+			// TODO: filter only project messages
+			try {
+				if (!newMessage) {
+					console.log('invalid message - skipped');
+					return;
+				}
+				console.log('App message received', { newMessage });
+				const json = JSON.parse(newMessage);
+				console.log('AppEvent', { json });
+				const { model } = json;
+				if (model === 'project') {
+					console.log('emit: project message');
+					emit('project', newMessage);
+				} else {
+					console.log('not a project message');
+				}
+			} catch (err) {
+				console.error(err);
+			}
 		};
-		projectStore.subscribe(`stream:`, onMessages);
+		appEventStore.subscribe(`stream:`, onMessages);
 	});
 }
 
 const names = ['my project', 'other project', 'last project'];
 
-const add = (name: string) => ({
+const add = (name: string): ActionEvent => ({
+	source: 'generator',
 	model: 'project',
 	action: 'add',
 	payload: {
 		name,
-		description: faker.lorem.paragraph
+		description: faker.lorem.sentence()
 	}
 });
 
-const remove = (name: string) => ({
+const remove = (name: string): ActionEvent => ({
+	source: 'generator',
 	model: 'project',
 	action: 'remove',
 	payload: {

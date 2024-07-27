@@ -1,8 +1,8 @@
 import { app } from '$lib/app/app';
-import type { AppEvent } from '../event';
+import type { ActionEvent } from '../event';
 
-export abstract class AppEventHandler {
+export abstract class ActionEventHandler {
 	organization = app.organization;
 
-	abstract process(event: AppEvent): void;
+	abstract process(event: ActionEvent): void;
 }

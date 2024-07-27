@@ -4,6 +4,7 @@ import { Project } from './project';
 import { Storable } from './storable';
 
 export class Member extends Storable {
+	model = 'member';
 	name: string;
 	storeName: string;
 	assigned?: Feature;
@@ -21,5 +22,13 @@ export class Member extends Storable {
 
 	assignFeature(feature: Feature) {
 		this.assigned = feature;
+	}
+
+	serialize() {
+		return {
+			id: this.id,
+			name: this.name
+			// description: this.description
+		};
 	}
 }

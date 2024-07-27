@@ -1,9 +1,9 @@
 // import Redis from 'ioredis';
 import RedisMock from 'ioredis-mock';
-import { RedisStore } from '$lib/stores/redis-rune-store.svelte';
+import { PubSub, RedisStore } from '$lib/stores/redis-rune-store.svelte';
 
 export const redis = new RedisMock(6380); // new Redis(process.env.REDIS_URL);
-export const pubsub = redis;
+export const pubsub = new PubSub(redis);
 
 export const createStore = (name: string = '', type: string) =>
 	new RedisStore(pubsub, `${name}@${type}`);

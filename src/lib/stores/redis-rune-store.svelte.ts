@@ -2,19 +2,15 @@ import type { Redis } from 'ioredis';
 
 export type subscribeFn = (value: string[], message: string) => void;
 
-export class RedisStore {
-	private pubsub: Redis;
-	private channel: string;
+export class PubSub {
 	private isConnected = false;
-	private messages = $state<string[]>([]);
-	private callbacks: Record<string, subscribeFn> = {};
+	redis: Redis;
 
-	constructor(pubsub: Redis, channel: string) {
-		this.pubsub = pubsub;
-		this.channel = channel;
+	constructor(redis: Redis) {
+		this.redis = redis;
 	}
 
-	async connectAndSubscribe() {
+	async connect() {
 		if (this.isConnected) {
 			console.log('Already connected to pubsub');
 			return;
@@ -22,20 +18,48 @@ export class RedisStore {
 
 		try {
 			console.log('Connecting to pubsub');
-			await this.pubsub.connect();
+			await this.redis.connect();
 			this.isConnected = true;
+		} catch (error) {
+			console.error('Error connecting to Redis:', error);
+			this.isConnected = false;
+		}
+	}
+}
 
-			await this.pubsub.subscribe(this.channel);
+export class RedisStore {
+	private pubsub: PubSub;
+	private channel: string;
+
+	private messages = $state<string[]>([]);
+	private callbacks: Record<string, subscribeFn> = {};
+
+	constructor(pubsub: PubSub, channel: string) {
+		this.pubsub = pubsub;
+		this.channel = channel;
+	}
+
+	async connect() {
+		await this.pubsub.connect();
+	}
+
+	get redis() {
+		return this.pubsub.redis;
+	}
+
+	async connectAndSubscribe() {
+		try {
+			await this.connect();
+			await this.redis.subscribe(this.channel);
 			console.log(`Subscribed to channel: ${this.channel}`);
 
-			this.pubsub.on('message', (receivedChannel: string, message: string) => {
+			this.redis.on('message', (receivedChannel: string, message: string) => {
 				if (receivedChannel === this.channel) {
 					this.add(message);
 				}
 			});
 		} catch (error) {
-			console.error('Error connecting to Redis:', error);
-			this.isConnected = false;
+			console.error('Error subscribing to Redis:', error);
 		}
 	}
 
@@ -45,15 +69,26 @@ export class RedisStore {
 	}
 
 	public unsubscribe() {
-		this.pubsub.unsubscribe(this.channel);
+		this.pubsub.redis.unsubscribe(this.channel);
 	}
 
 	public set(newMessages: string[]) {
 		this.messages = newMessages;
 	}
 
+	public addObj(obj: unknown) {
+		console.log('addObj', obj);
+		const message = JSON.stringify(obj);
+		console.log('stringified message', message);
+		this.add(message);
+	}
+
 	public add(message: string) {
 		console.log('add message to store', message);
+		if (!message) {
+			console.log('invalid message to add - skipped');
+			return;
+		}
 		this.messages = [...this.messages, message];
 		console.log('call callback with store data');
 		const names = Object.keys(this.callbacks);
@@ -71,6 +106,6 @@ export class RedisStore {
 
 	public destroy() {
 		this.unsubscribe();
-		this.pubsub.disconnect();
+		this.pubsub.redis.disconnect();
 	}
 }
