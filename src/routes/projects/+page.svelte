@@ -10,15 +10,18 @@
 
 	const transformed = channel.transform(function run(data) {
 		if (data === '') return;
+		console.log('transform:', data);
 		// TODO: parse json
-		return `transformed: ${data}`;
+		return `${data}`;
 	});
 
 	let messages = $state<string[]>([]);
+	let lastMessage = $state<string>('');
 
 	transformed.subscribe((value: string) => {
 		if (value) {
 			messages = [...messages, value];
+			lastMessage = value;
 		}
 	});
 
@@ -26,8 +29,8 @@
 	let description = $state('');
 	let titleInput = $state<HTMLInputElement>();
 
-	async function postMessage() {
-		console.log('post message');
+	async function postProjectEvent() {
+		console.log('post project event');
 		if (title.trim() === '') {
 			console.log('missing title');
 			return;
@@ -53,6 +56,33 @@
 			console.error('Error:', data.error);
 		}
 	}
+
+	import { getToastState } from '$lib/toast-state.svelte';
+
+	const toastState = getToastState();
+
+	const toastMap = new Map<string, unknown>();
+
+	$effect(() => {
+		const message = lastMessage;
+		if (!message) return;
+
+		const json = JSON.parse(message);
+		const { payload } = json;
+		const { name, description } = payload;
+		if (!name) {
+			console.log('missing name', payload);
+			return;
+		}
+		// already processed
+		if (toastMap.get(name)) {
+			console.log('already made toast for', name);
+			return;
+		}
+		toastMap.set(name, payload);
+		console.log('toast message', name);
+		toastState.add(name, description);
+	});
 </script>
 
 <div>
@@ -67,7 +97,7 @@
 	<form
 		onsubmit={(e) => {
 			e.preventDefault();
-			postMessage();
+			postProjectEvent();
 			title = '';
 			description = '';
 			titleInput?.focus();
@@ -90,15 +120,12 @@
 		</div>
 		<button class="rounded-md bg-gray-300 p-1"> Add toast! </button>
 	</form>
-
-	<h2>Messages</h2>
-	{#if messages.length === 0}
-		<p>No messages yet.</p>
-	{:else}
-		<ul>
-			{#each messages as message}
-				<li>message: {message}</li>
-			{/each}
-		</ul>
-	{/if}
 </div>
+
+<style>
+	.project-item {
+		background: green;
+		color: white;
+		font-weight: 400;
+	}
+</style>

@@ -2,8 +2,9 @@ import { createMemberStore, createTeamStore } from '$lib/server/redis';
 import { Backlog } from './backlog';
 import type { Member } from './member';
 import { Project } from './project';
+import { Storable } from './storable';
 
-export class Team extends Storage {
+export class Team extends Storable {
 	id: string;
 	name: string;
 	description?: string;
@@ -22,8 +23,8 @@ export class Team extends Storage {
 		this.name = name;
 		this.description = description;
 		this.storeName = `${name}@team`;
-		this.stores['members'] = createMemberStore();
-		this.stores[this.storeName] = createTeamStore(this.storeName);
+		this.stores.set('members', createMemberStore());
+		this.stores.set(this.storeName, createTeamStore(this.storeName));
 		this.backlog = new Backlog();
 	}
 
