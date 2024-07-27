@@ -15,11 +15,11 @@
 		return `${data}`;
 	});
 
-	$effect(() => {
-		if (!data) return;
-		messages = [...messages, ...data];
-		projects = [...projects, ...data];
-	});
+	// $effect(() => {
+	// 	if (!data.projects) return;
+	// 	// messages = [...messages, ...data.projects];
+	// 	projects = [...projects, ...data.projects];
+	// });
 
 	let projects = $state<ProjectPayload[]>([]);
 	let messages = $state<string[]>([]);
@@ -112,7 +112,7 @@
 
 	<ul class="project-list">
 		{#each projects as project}
-			<li class="project-item"><a href="/projects/{project.name}">{project.name}</a></li>
+			<li class="project-item"><a href="/projects/{project.id}">{project.name}</a></li>
 		{/each}
 	</ul>
 

@@ -2,16 +2,18 @@ import { app } from '$lib/app/app';
 import type { ActionEvent } from '$lib/app/events/event';
 import type { ActionEventHandler } from '$lib/app/events/handlers/event.handler';
 import { projectEventHandler } from '$lib/app/events/handlers/project.event.handler';
+import { teamMemberEventHandler } from '$lib/app/events/handlers/team-member.event.handler';
 import { teamEventHandler } from '$lib/app/events/handlers/team.event.handler';
+import { generateProjectEvents } from '$lib/app/generators/project.event.generator';
+import { generateTeamEvents } from '$lib/app/generators/team.event.generator';
 import { produce } from 'sveltekit-sse';
-import { faker } from '@faker-js/faker';
 
-const projectStore = app.organization.projectStore; //stores['project'];
 const appEventStore = app.appEvents;
 
 const eventHandlers = new Map<string, ActionEventHandler>();
 eventHandlers.set('project', projectEventHandler);
 eventHandlers.set('team', teamEventHandler);
+eventHandlers.set('member', teamMemberEventHandler);
 
 const onActionEvents = (messages: string[], newMessage: string) => {
 	try {
@@ -28,6 +30,7 @@ const onActionEvents = (messages: string[], newMessage: string) => {
 	}
 };
 
+const projectStore = app.organization.projectStore;
 projectStore.subscribe('app', onActionEvents);
 
 export function POST() {
@@ -58,42 +61,5 @@ export function POST() {
 	});
 }
 
-const names = ['my project', 'other project', 'last project'];
-
-const add = (name: string): ActionEvent => ({
-	source: 'generator',
-	model: 'project',
-	action: 'add',
-	payload: {
-		name,
-		description: faker.lorem.sentence()
-	}
-});
-
-const remove = (name: string): ActionEvent => ({
-	source: 'generator',
-	model: 'project',
-	action: 'remove',
-	payload: {
-		name
-	}
-});
-
-const messages = [
-	add(names[0]),
-	add(names[1]),
-	remove(names[0]),
-	add(names[2]),
-	remove(names[1]),
-	remove(names[2])
-];
-
-// setInterval(() => {
-// 	projectStore.add('hello: ' + crypto.randomUUID());
-// }, 4000);
-
-setInterval(() => {
-	const msg = messages.shift();
-	const json = JSON.stringify(msg, null, 2);
-	projectStore.add(json);
-}, 4000);
+generateProjectEvents();
+generateTeamEvents();

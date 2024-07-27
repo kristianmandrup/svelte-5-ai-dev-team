@@ -1,15 +1,17 @@
 import { app } from '$lib/app/app';
-import type { Project } from '$lib/app/project.js';
 
 export const load = async ({ params }) => {
-	const project: Project = app.organization.project(params.id);
+	const id = params.id;
+	const project = app.organization.project(id);
 	if (project) {
+		console.log('load project', id);
 		const { name, description } = project;
 		const teams = project.teams;
+		const list = Object.values(teams);
 		return {
 			name,
 			description,
-			teams: Object.values(teams).map((item) => item.serialize())
+			teams: list.map((item) => item.serialize())
 		};
 	} else {
 		return {

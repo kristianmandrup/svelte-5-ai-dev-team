@@ -24,7 +24,14 @@ export class Organization extends Storable {
 	}
 
 	project(id: string) {
-		return this.projects.get(id) || this.projectByName(id);
+		return this.projects.get(id);
+	}
+
+	team(id: string) {
+		const projects = Array.from(this.projects.values());
+		const project = projects.find((proj) => proj.team(id));
+		if (!project) return;
+		return project.team(id);
 	}
 
 	projectByName(name: string) {
@@ -34,6 +41,9 @@ export class Organization extends Storable {
 	updateProject(payload: ProjectPayload) {
 		const { id, name, description } = payload;
 		const project = this.project(id);
+		if (!project) {
+			throw new Error(`No such project: ${id}`);
+		}
 		project.name = name;
 		project.description = description;
 	}

@@ -20,17 +20,6 @@
 			<li class="project-item"><a href="/teams/{team.id}">{team.name}</a></li>
 		{/each}
 	</ul>
-
-	<h2>Messages</h2>
-	{#if messages.length === 0}
-		<p>No messages yet.</p>
-	{:else}
-		<ul>
-			{#each messages as message}
-				<li>{message}</li>
-			{/each}
-		</ul>
-	{/if}
 </div>
 
 <style>

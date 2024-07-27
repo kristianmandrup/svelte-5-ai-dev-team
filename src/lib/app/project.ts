@@ -25,6 +25,10 @@ export class Project extends Storable {
 		this.stores.set(this.storeName, createProjectStore(this.storeName));
 	}
 
+	team(id: string) {
+		return this.teams.get(id);
+	}
+
 	serialize() {
 		return {
 			id: this.id,
