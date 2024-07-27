@@ -1,13 +1,13 @@
 import { faker } from '@faker-js/faker';
 import type { ActionEvent } from '../events/event';
 import { app } from '../app';
-import type { TeamPayload } from '../events/team.events';
+import type { TeamMemberPayload } from '../events/member.events';
 
 const names = ['Team A', 'Team B', 'Team X'];
 
 const add = (name: string): ActionEvent => ({
 	source: 'generator',
-	model: 'team',
+	model: 'team-member',
 	action: 'add',
 	payload: {
 		name,
@@ -17,7 +17,7 @@ const add = (name: string): ActionEvent => ({
 
 const remove = (name: string): ActionEvent => ({
 	source: 'generator',
-	model: 'team',
+	model: 'team-member',
 	action: 'remove',
 	payload: {
 		name
@@ -36,20 +36,19 @@ const eventLog = [
 export const getRandom = (items: string[]): string =>
 	items[Math.floor(Math.random() * items.length)];
 
-export const generateTeamEvents = () => {
+export const generateTeamMemberEvents = () => {
 	setInterval(() => {
-		const projectIds: string[] = Array.from(app.organization.projects.keys());
-
+		const teamIds: string[] = app.organization.teamList.map((team) => team.id);
 		const event: ActionEvent | undefined = eventLog.shift();
 		if (!event) return;
-		const projectId = getRandom(projectIds);
-		const payload = event.payload as TeamPayload;
-		payload.projectId = projectId;
-		const project = app.organization.project(projectId);
-		if (!project) {
-			console.error(`No project: ${projectId}`);
+		const teamId = getRandom(teamIds);
+		const payload = event.payload as TeamMemberPayload;
+		payload.teamId = teamId;
+		const team = app.organization.team(teamId);
+		if (!team) {
+			console.error(`No team: ${teamId}`);
 			return;
 		}
-		project.teamStore.addObj(event);
+		team.memberStore.addObj(event);
 	}, 3000);
 };

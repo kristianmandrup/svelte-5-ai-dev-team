@@ -1,4 +1,5 @@
 import { createMemberStore, createTeamStore } from '$lib/server/redis';
+import type { RedisStore } from '$lib/stores/redis-rune-store.svelte';
 import { Backlog } from './backlog';
 import type { Member } from './member';
 import { Project } from './project';
@@ -13,6 +14,7 @@ export class Team extends Storable {
 	storeName: string;
 	members = new Map<string, Member>();
 	backlog: Backlog;
+	memberStore: RedisStore;
 
 	static create(name: string) {
 		return new Project(name);
@@ -24,7 +26,8 @@ export class Team extends Storable {
 		this.name = name;
 		this.description = description;
 		this.storeName = `${name}@team`;
-		this.stores.set('members', createMemberStore());
+		// this.stores.set('members', createMemberStore());
+		this.memberStore = createMemberStore();
 		this.stores.set(this.storeName, createTeamStore(this.storeName));
 		this.backlog = new Backlog();
 	}

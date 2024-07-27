@@ -29,6 +29,10 @@ export class Project extends Storable {
 		return this.teams.get(id);
 	}
 
+	get teamList() {
+		return Array.from(this.teams.values());
+	}
+
 	serialize() {
 		return {
 			id: this.id,

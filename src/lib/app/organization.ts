@@ -27,6 +27,14 @@ export class Organization extends Storable {
 		return this.projects.get(id);
 	}
 
+	get teamList() {
+		return this.projectList.map((proj) => proj.teamList).flat();
+	}
+
+	get projectList() {
+		return Array.from(this.projects.values());
+	}
+
 	team(id: string) {
 		const projects = Array.from(this.projects.values());
 		const project = projects.find((proj) => proj.team(id));

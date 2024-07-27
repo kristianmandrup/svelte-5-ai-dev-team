@@ -23,7 +23,7 @@ const remove = (name: string): ActionEvent => ({
 	}
 });
 
-const messages = [
+const eventLog = [
 	add(names[0]),
 	add(names[1]),
 	remove(names[0]),
@@ -37,9 +37,8 @@ const projectStore = app.organization.projectStore;
 
 export const generateProjectEvents = () => {
 	setInterval(() => {
-		const msg = messages.shift();
-		if (!msg) return;
-		const json = JSON.stringify(msg, null, 2);
-		projectStore.add(json);
+		const event = eventLog.shift();
+		if (!event) return;
+		projectStore.addObj(event);
 	}, 2000);
 };
