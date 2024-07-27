@@ -9,7 +9,7 @@ export class Team extends Storage {
 	description?: string;
 
 	storeName: string;
-	members: Record<string, Member> = {};
+	members = new Map<string, Member>();
 	backlog: Backlog;
 
 	static create(name: string) {
@@ -36,10 +36,10 @@ export class Team extends Storage {
 	}
 
 	addMember(member: Member) {
-		this.members[member.name] = member;
+		this.members.set(member.id, member);
 	}
 
 	removeMember(name: string) {
-		delete this.members[name];
+		this.members.delete(name);
 	}
 }

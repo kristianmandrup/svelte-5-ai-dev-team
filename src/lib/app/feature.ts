@@ -9,6 +9,6 @@ export class Feature extends Storable {
 		super();
 		this.name = name;
 		this.storeName = `${name}@feature`;
-		this.stores[this.storeName] = createStore(this.storeName, 'feature');
+		this.stores.set(this.storeName, createStore(this.storeName, 'feature'));
 	}
 }

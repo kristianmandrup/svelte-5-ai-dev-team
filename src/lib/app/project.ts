@@ -3,11 +3,10 @@ import { Storable } from './storable';
 import type { Team } from './team';
 
 export class Project extends Storable {
-	id: string;
 	name: string;
 	description?: string;
 	storeName: string;
-	teams: Record<string, Team> = {};
+	teams = new Map<string, Team>();
 
 	static create(name: string) {
 		return new Project(name);
@@ -15,12 +14,11 @@ export class Project extends Storable {
 
 	constructor(name: string, description?: string) {
 		super();
-		this.id = crypto.randomUUID().slice(0, 6);
 		this.name = name;
 		this.description = description;
 		this.storeName = `${name}@team`;
-		this.stores['teams'] = createTeamStore();
-		this.stores[this.storeName] = createProjectStore(this.storeName);
+		this.stores.set('teams', createTeamStore());
+		this.stores.set(this.storeName, createProjectStore(this.storeName));
 	}
 
 	serialize() {
@@ -32,10 +30,10 @@ export class Project extends Storable {
 	}
 
 	addTeam(team: Team) {
-		this.teams[team.name] = team;
+		this.teams.set(team.name, team);
 	}
 
 	removeTeam(name: string) {
-		delete this.teams[name];
+		this.teams.delete(name);
 	}
 }

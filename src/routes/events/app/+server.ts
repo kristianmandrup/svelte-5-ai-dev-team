@@ -1,41 +1,31 @@
 import { app } from '$lib/app/app';
 import type { AppEvent } from '$lib/app/events/event';
-import type { AddProjectPayload, RemoveProjectPayload } from '$lib/app/events/project.events';
-import { Project } from '$lib/app/project';
+import type { AppEventHandler } from '$lib/app/events/handlers/event.handler';
+import { projectEventHandler } from '$lib/app/events/handlers/project.event.handler';
+import { teamEventHandler } from '$lib/app/events/handlers/team.event.handler';
 import { produce } from 'sveltekit-sse';
 
 console.log(app.organization.projectStore);
 
 const projectStore = app.organization.projectStore; //stores['project'];
 
+const eventHandlers = new Map<string, AppEventHandler>();
+eventHandlers.set('project', projectEventHandler);
+eventHandlers.set('team', teamEventHandler);
+
 const onAppMessages = (messages: string[], newMessage: string) => {
 	try {
 		const json = JSON.parse(newMessage);
 		const event = json as AppEvent;
-		switch (event.action) {
-			case 'add':
-				return onAddProject(event);
-			case 'remove':
-				return onRemoveProject(event);
-			default:
-				console.log(`unknown action: ${event.action}`);
+		const { model } = event;
+		const handler = eventHandlers.get(model);
+		if (!handler) {
+			throw new Error(`Unknown event model: ${model}`);
 		}
+		handler.process(event);
 	} catch (err) {
 		console.log(err);
 	}
-};
-
-const onAddProject = (event: AppEvent) => {
-	const payload = event.payload as AddProjectPayload;
-	const { name, description } = payload;
-	const project = new Project(name, description);
-	app.organization.addProject(project);
-};
-
-const onRemoveProject = (event: AppEvent) => {
-	const payload = event.payload as RemoveProjectPayload;
-	const { name } = payload;
-	app.organization.removeProject(name);
 };
 
 projectStore.subscribe('app', onAppMessages);
