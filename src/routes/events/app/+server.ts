@@ -51,12 +51,8 @@ export function POST() {
 				const json = JSON.parse(newMessage);
 				console.log('AppEvent', { json });
 				const { model } = json;
-				if (model === 'project') {
-					console.log('emit: project message');
-					emit('project', newMessage);
-				} else {
-					console.log('not a project message');
-				}
+				console.log('emit: app message', model);
+				emit(model, newMessage);
 			} catch (err) {
 				console.error(err);
 			}

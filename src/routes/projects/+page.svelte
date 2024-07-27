@@ -22,25 +22,22 @@
 	// });
 
 	let projects = $state<ProjectPayload[]>([]);
-	let messages = $state<string[]>([]);
 	let lastMessage = $state<string>('');
 
 	transformed.subscribe((value: string) => {
-		if (value) {
-			messages = [...messages, value];
-			lastMessage = value;
-			const json = JSON.parse(value);
-			console.log('unpacked', json);
-			const { source, model, action, data } = json;
-			if (model !== 'project') {
-				console.log('not a project event');
-				return;
-			}
-			console.log('event', { source, model, action });
-			const project = data;
-			// TODO: depending on the event, add, remove or update the project
-			projects = [...projects, project];
+		if (!value) return;
+		lastMessage = value;
+		const json = JSON.parse(value);
+		console.log('unpacked', json);
+		const { source, model, action, data } = json;
+		if (model !== 'project') {
+			console.log('not a project event');
+			return;
 		}
+		console.log('event', { source, model, action });
+		const project = data;
+		// TODO: depending on the event, add, remove or update the project
+		projects = [...projects, project];
 	});
 
 	let title = $state('');
