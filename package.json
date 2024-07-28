@@ -41,9 +41,11 @@
 	"type": "module",
 	"dependencies": {
 		"@faker-js/faker": "^8.4.1",
+		"@internationalized/date": "^3.5.5",
 		"@types/ioredis-mock": "^8.2.5",
 		"bits-ui": "^0.21.12",
 		"clsx": "^2.1.1",
+		"cmdk-sv": "^0.0.18",
 		"ioredis": "^5.4.1",
 		"ioredis-mock": "^8.9.0",
 		"lucide-svelte": "^0.417.0",
