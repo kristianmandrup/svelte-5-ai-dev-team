@@ -1,47 +1,12 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import type { ProjectPayload } from '$lib/app/events/project.events';
-	import { SseStore } from '$lib/stores/sse-store.svelte';
+	import { useSseStore } from '$lib/stores/sse-store.svelte';
 	import { superForm } from 'sveltekit-superforms';
-
 	// Access the loaded data using $props
 	const { data } = $props<{ data: PageData }>();
 	const { form, errors, enhance, constraints } = superForm<ProjectPayload>(data.form);
-
-	const sseStore = new SseStore<ProjectPayload>({ model: 'project' });
-
-	let title = $state('');
-	let description = $state('');
-	let titleInput = $state<HTMLInputElement>();
-
-	// async function postProjectEvent() {
-	// 	console.log('post project event');
-	// 	if (title.trim() === '') {
-	// 		console.log('missing title');
-	// 		return;
-	// 	}
-	// 	const payload = { title, description };
-	// 	const event = {
-	// 		model: 'project',
-	// 		action: 'add',
-	// 		payload
-	// 	};
-	// 	const response = await fetch('/api/projects', {
-	// 		method: 'POST',
-	// 		headers: {
-	// 			'Content-Type': 'application/json'
-	// 		},
-	// 		body: JSON.stringify({ event })
-	// 	});
-	// 	console.log('Post response', response);
-	// 	const data = await response.json();
-	// 	if (response.ok) {
-	// 		console.log('project added:', title);
-	// 	} else {
-	// 		console.error('Error:', data.error);
-	// 	}
-	// }
-
+	const sseStore = useSseStore<ProjectPayload>({ model: 'project' });
 	let allProjects = $derived(data.projects.push(sseStore.projects));
 </script>
 

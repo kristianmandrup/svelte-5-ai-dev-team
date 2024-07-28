@@ -87,3 +87,5 @@ export class SseStore<T extends Named> {
 		this.projects.splice(indexToReplace, 1, payload);
 	}
 }
+
+export const useSseStore = <T extends Named>(opts: CreateSseStoreOpts) => new SseStore<T>(opts);
