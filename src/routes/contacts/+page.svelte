@@ -15,12 +15,12 @@
 		method="POST"
 		action="?/create"
 		class="flex w-full flex-col"
-		use:enhance={() => {
+		use:enhance={({ formElement }) => {
 			// Before form submission to server
 			return async ({ result, update }) => {
 				// After form submission to server
 				if (result.type === 'success') {
-					form.reset();
+					formElement.reset();
 				}
 				if (result.type === 'failure') {
 					await applyAction(result);
