@@ -2,6 +2,10 @@ import type { RedisStore } from '$lib/stores/redis-store.svelte';
 import { app, type ActionType } from './app';
 import type { AppEvent } from './events/event';
 
+export type NamedItem = {
+	id: string;
+	name: string;
+};
 export abstract class Storable {
 	id: string;
 	model = 'unknown';
@@ -16,6 +20,10 @@ export abstract class Storable {
 	}
 
 	abstract serialize(): unknown;
+
+	byName($map: Map<string, NamedItem>, name: string) {
+		return Array.from($map.values()).find((p: NamedItem) => p.name === name);
+	}
 
 	get appEvents() {
 		return app.appEvents;
@@ -47,5 +55,11 @@ export abstract class Storable {
 			case 'remove':
 				return { id: this.id };
 		}
+	}
+
+	remove($map: Map<string, NamedItem>, name: string) {
+		const item = this.byName($map, name);
+		if (!item) return;
+		$map.delete(item.id);
 	}
 }

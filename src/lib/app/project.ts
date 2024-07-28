@@ -46,6 +46,6 @@ export class Project extends Storable {
 	}
 
 	removeTeam(name: string) {
-		this.teams.delete(name);
+		this.remove(this.teams, name);
 	}
 }

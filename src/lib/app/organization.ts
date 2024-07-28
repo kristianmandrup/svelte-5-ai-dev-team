@@ -42,10 +42,6 @@ export class Organization extends Storable {
 		return project.team(id);
 	}
 
-	projectByName(name: string) {
-		return Object.values(this.projects).find((p) => p.name === name);
-	}
-
 	updateProject(payload: ProjectPayload) {
 		const { id, name, description } = payload;
 		const project = this.project(id);
@@ -61,11 +57,10 @@ export class Organization extends Storable {
 		project.publishEvent('add');
 	}
 
-	removeProject(id: string) {
-		const project = this.projects.get(id);
-		if (!project) return;
-		project.publishEvent('remove');
-		this.projects.delete(id);
+	removeProject(name: string) {
+		const project = this.byName(this.projects, name);
+		this.remove(this.projects, name);
+		(project as Project).publishEvent('remove');
 	}
 
 	addMember(member: Member) {
