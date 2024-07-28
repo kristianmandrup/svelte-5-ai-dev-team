@@ -11,6 +11,10 @@ const newProjectSchema = z.object({
 	description: z.string().optional()
 });
 
+const deleteSchema = z.object({
+	id: z.string()
+});
+
 export const load = async () => {
 	// const project = {
 	// 	name: ''
@@ -24,15 +28,29 @@ export const load = async () => {
 };
 
 export const actions = {
-	default: async (event) => {
+	create: async (event) => {
 		const form = await superValidate(event, zod(newProjectSchema));
-		console.log(form);
+		console.log('create', form);
 		if (!form.valid) {
 			return fail(400, {
 				form
 			});
 		}
 		// TODO: process form data
+
+		return {
+			form
+		};
+	},
+
+	delete: async (event) => {
+		const form = await superValidate(event, zod(deleteSchema));
+		console.log('delete', form);
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
 
 		return {
 			form

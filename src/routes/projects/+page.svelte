@@ -21,7 +21,7 @@
 		{/each}
 	</ul>
 
-	<form method="POST" use:enhance class="flex w-1/4 flex-col gap-2">
+	<form method="POST" use:enhance class="flex w-1/4 flex-col gap-2" action="?/create">
 		<div class="flex flex-col gap-1">
 			<label for="title">Title</label>
 			<input
