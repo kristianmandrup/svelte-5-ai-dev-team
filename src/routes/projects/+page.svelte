@@ -15,7 +15,9 @@
 
 	<ul class="project-list">
 		{#each allProjects as project}
-			<li class="project-item"><a href="/projects/{project.id}">{project.name}</a></li>
+			<li class="project-item">
+				<a href="/projects/{project.id}" data-sveltekit-preload-data>{project.name}</a>
+			</li>
 		{/each}
 	</ul>
 
