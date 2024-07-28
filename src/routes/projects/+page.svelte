@@ -1,44 +1,15 @@
 <script lang="ts">
 	import { source } from 'sveltekit-sse';
 	import type { PageData } from './$types';
+	import { getToastState } from '$lib/toast-state.svelte';
+	import type { ProjectPayload } from '$lib/app/events/project.events';
+	import type { AppEvent } from '$lib/app/events/event';
+	import { SseStore } from '$lib/stores/sse-store.svelte';
 
 	// Access the loaded data using $props
 	const { data } = $props<{ data: PageData }>();
 
-	const connection = source('/events/app');
-	const channel = connection.select('project');
-
-	const transformed = channel.transform(function run(data) {
-		if (data === '') return;
-		console.log('transform:', data);
-		// TODO: parse json
-		return `${data}`;
-	});
-
-	// $effect(() => {
-	// 	if (!data.projects) return;
-	// 	// messages = [...messages, ...data.projects];
-	// 	projects = [...projects, ...data.projects];
-	// });
-
-	let projects = $state<ProjectPayload[]>([]);
-	let lastMessage = $state<string>('');
-
-	transformed.subscribe((value: string) => {
-		if (!value) return;
-		lastMessage = value;
-		const json = JSON.parse(value);
-		console.log('unpacked', json);
-		const { source, model, action, data } = json;
-		if (model !== 'project') {
-			console.log('not a project event');
-			return;
-		}
-		console.log('event', { source, model, action });
-		const project = data;
-		// TODO: depending on the event, add, remove or update the project
-		projects = [...projects, project];
-	});
+	const sseStore = new SseStore<ProjectPayload>({ model: 'project' });
 
 	let title = $state('');
 	let description = $state('');
@@ -72,43 +43,14 @@
 		}
 	}
 
-	import { getToastState } from '$lib/toast-state.svelte';
-	import type { ProjectPayload } from '$lib/app/events/project.events';
-
-	const toastState = getToastState();
-
-	const toastMap = new Map<string, unknown>();
-
-	$effect(() => {
-		const message = lastMessage;
-		if (!message) return;
-
-		const json = JSON.parse(message);
-		const { data } = json;
-		if (!data) {
-			console.error('missing data', json);
-		}
-		const { name, description } = data;
-		if (!name) {
-			console.log('missing name', data);
-			return;
-		}
-		// already processed
-		if (toastMap.get(name)) {
-			console.log('already made toast for', name);
-			return;
-		}
-		toastMap.set(name, data);
-		console.log('toast message', name);
-		toastState.add(name, description);
-	});
+	let allProjects = $derived(data.projects.push(sseStore.projects));
 </script>
 
 <div>
 	<h1>Projects</h1>
 
 	<ul class="project-list">
-		{#each projects as project}
+		{#each allProjects as project}
 			<li class="project-item"><a href="/projects/{project.id}">{project.name}</a></li>
 		{/each}
 	</ul>

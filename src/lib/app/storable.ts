@@ -1,4 +1,4 @@
-import type { RedisStore } from '$lib/stores/redis-rune-store.svelte';
+import type { RedisStore } from '$lib/stores/redis-store.svelte';
 import { app, type ActionType } from './app';
 import type { AppEvent } from './events/event';
 

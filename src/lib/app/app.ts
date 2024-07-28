@@ -1,5 +1,5 @@
 import { createStore } from '$lib/server/redis';
-import type { RedisStore } from '$lib/stores/redis-rune-store.svelte';
+import type { RedisStore } from '$lib/stores/redis-store.svelte';
 import { Organization } from './organization';
 
 export type ActionType = 'add' | 'remove' | 'update';

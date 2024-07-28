@@ -1,5 +1,5 @@
 import { createTeamStore, createProjectStore } from '$lib/server/redis';
-import type { RedisStore } from '$lib/stores/redis-rune-store.svelte';
+import type { RedisStore } from '$lib/stores/redis-store.svelte';
 import { Storable } from './storable';
 import type { Team } from './team';
 
