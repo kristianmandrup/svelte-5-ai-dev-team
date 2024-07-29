@@ -15,7 +15,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { cn } from '$lib/utils.js';
+	import { cn } from '$lib/components/utils.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 
 	type Payment = {

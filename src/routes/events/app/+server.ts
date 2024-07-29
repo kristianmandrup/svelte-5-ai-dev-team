@@ -6,7 +6,7 @@ import { projectEventHandler } from '$lib/app/events/handlers/project.event.hand
 import { teamMemberEventHandler } from '$lib/app/events/handlers/team-member.event.handler';
 import { teamEventHandler } from '$lib/app/events/handlers/team.event.handler';
 import { generateMemberEvents } from '$lib/app/generators';
-import { generateProjectEvents } from '$lib/app/generators/project.event.generator';
+import { projectEvents } from '$lib/app/generators/project.event.generator';
 import { generateTeamMemberEvents } from '$lib/app/generators/team-member.event.generator';
 import { generateTeamEvents } from '$lib/app/generators/team.event.generator';
 import { produce } from 'sveltekit-sse';
@@ -61,7 +61,9 @@ export function POST() {
 	});
 }
 
-generateProjectEvents();
+projectEvents.addEvents();
+projectEvents.removeEvents();
+
 generateTeamEvents();
 generateTeamMemberEvents();
 generateMemberEvents();

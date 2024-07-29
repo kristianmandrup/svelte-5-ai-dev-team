@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import type { ActionEvent } from '../events/event';
 import { app } from '../app';
 import type { TeamMemberPayload } from '../events/member.events';
+import { getRandom } from './utils';
 
 const names = ['Jack', 'Willy', 'Maria'];
 
@@ -32,8 +33,6 @@ const eventLog = [
 	remove(names[1])
 	// remove(names[2])
 ];
-
-const getRandom = (items: string[]): string => items[Math.floor(Math.random() * items.length)];
 
 export const generateTeamMemberEvents = () => {
 	setInterval(() => {

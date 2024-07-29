@@ -1,3 +1,5 @@
+export type ActionPayload = Record<string, unknown>;
+
 export type AppEvent = {
 	source: 'app';
 	model: string;
@@ -9,7 +11,7 @@ export type ActionEvent = {
 	source: string;
 	model: string;
 	action: string;
-	payload: unknown;
+	payload: ActionPayload;
 };
 
 export type ActionResult = 'success' | 'failure';
@@ -18,6 +20,6 @@ export type ActionResultEvent = {
 	source: string;
 	model: string;
 	action: string;
-	payload: unknown;
+	payload: ActionPayload;
 	result: ActionResult;
 };

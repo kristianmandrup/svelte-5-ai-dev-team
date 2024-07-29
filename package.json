@@ -53,6 +53,7 @@
 		"sass": "^1.77.8",
 		"svelte-dnd-action": "^0.9.49",
 		"svelte-dnd-list": "^0.1.8",
+		"svelte-headless-table": "^0.18.2",
 		"svelte-radix": "^1.1.0",
 		"sveltekit-sse": "^0.13.2",
 		"tailwind-merge": "^2.4.0",

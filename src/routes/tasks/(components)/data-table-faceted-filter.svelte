@@ -5,8 +5,8 @@
 	import * as Command from '$lib/components/ui/command/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { cn } from '$lib/utils.js';
-	import { Separator } from '$lib/registry/default/ui/separator/index.js';
+	import { cn } from '$lib/components/utils.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 
 	export let filterValues: string[] = [];

@@ -1,10 +1,21 @@
 <script>
 	import { enhance, applyAction } from '$app/forms';
 	import ContactsTable from '$lib/components/ContactsTable.svelte';
+	import { message } from 'sveltekit-superforms';
 	import Alert from '../../lib/components/Alert.svelte';
 
+	// TODO: convert to $props
 	export let data;
-	export let form;
+
+	// TODO: convert to svelte 5
+	let form = {
+		name: '',
+		email: '',
+		company: '',
+		job: '',
+		message: '',
+		error: ''
+	};
 </script>
 
 <div class="w-full">
