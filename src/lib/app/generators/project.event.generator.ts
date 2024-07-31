@@ -26,8 +26,8 @@ const remove = (name: string): ActionEvent => ({
 });
 
 const eventLog = {
-	add: [add(names[0]), add(names[1]), add(names[2]), add(names[3])],
-	remove: [remove(names[0])]
+	add: names.map((name) => add(name)),
+	remove: names.map((name) => remove(name))
 };
 
 const projectStore = app.organization.projectStore;
@@ -43,9 +43,8 @@ const addEvents = () => {
 const removeEvents = () => {
 	setTimeout(() => {
 		setInterval(() => {
-			const projectIds: string[] = app.organization.projectList.map((team) => team.id);
+			const projectIds: string[] = app.organization.projectIds;
 			const event: ActionEvent | undefined = eventLog.remove.shift();
-			if (!event) return;
 			if (!event) return;
 			const projectId = getRandom(projectIds);
 			event.payload.id = projectId;
@@ -56,5 +55,9 @@ const removeEvents = () => {
 
 export const projectEvents = {
 	addEvents,
-	removeEvents
+	removeEvents,
+	all: () => {
+		addEvents();
+		removeEvents();
+	}
 };

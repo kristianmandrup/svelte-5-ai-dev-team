@@ -1,5 +1,6 @@
 import { createTeamStore, createProjectStore } from '$lib/server/redis';
 import type { RedisStore } from '$lib/stores/redis-store.svelte';
+import type { TeamPayload } from './events/team.events';
 import { Storable } from './storable';
 import type { Team } from './team';
 
@@ -33,6 +34,10 @@ export class Project extends Storable {
 		return Array.from(this.teams.values());
 	}
 
+	get teamIds() {
+		return this.teamList.map((team) => team.id);
+	}
+
 	serialize() {
 		return {
 			id: this.id,
@@ -41,11 +46,21 @@ export class Project extends Storable {
 		};
 	}
 
-	addTeam(team: Team) {
-		this.teams.set(team.name, team);
+	updateProject(payload: TeamPayload) {
+		const { id, name, description } = payload;
+		const team = this.team(id);
+		if (!team) {
+			throw new Error(`No such team: ${id}`);
+		}
+		team.name = name;
+		team.description = description;
 	}
 
-	removeTeam(name: string) {
-		this.remove(this.teams, name);
+	addTeam(team: Team) {
+		this.addItem(this.teams, team);
+	}
+
+	removeTeam(id: string) {
+		this.removeItem(this.teams, id);
 	}
 }

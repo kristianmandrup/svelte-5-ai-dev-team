@@ -32,6 +32,18 @@ export class Team extends Storable {
 		this.backlog = new Backlog();
 	}
 
+	member(id: string) {
+		return this.members.get(id);
+	}
+
+	get memberList() {
+		return Array.from(this.members.values());
+	}
+
+	get memberIds() {
+		return this.memberList.map((mem) => mem.id);
+	}
+
 	serialize() {
 		return {
 			id: this.id,
@@ -44,7 +56,7 @@ export class Team extends Storable {
 		this.members.set(member.id, member);
 	}
 
-	removeMember(name: string) {
-		this.remove(this.members, name);
+	removeMember(id: string) {
+		this.removeItem(this.members, id);
 	}
 }

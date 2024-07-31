@@ -1,4 +1,5 @@
 export type MemberPayload = {
+	id: string;
 	name: string;
 	description?: string;
 };

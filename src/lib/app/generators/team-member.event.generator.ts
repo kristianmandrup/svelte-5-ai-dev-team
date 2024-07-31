@@ -2,9 +2,10 @@ import { faker } from '@faker-js/faker';
 import type { ActionEvent } from '../events/event';
 import { app } from '../app';
 import type { TeamMemberPayload } from '../events/member.events';
-import { getRandom } from './utils';
+import { getRandom, list } from './utils';
 
-const names = ['Jack', 'Willy', 'Maria'];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const names = list(6).map((_) => faker.person.firstName());
 
 const add = (name: string): ActionEvent => ({
 	source: 'generator',
@@ -25,19 +26,15 @@ const remove = (name: string): ActionEvent => ({
 	}
 });
 
-const eventLog = [
-	add(names[0]),
-	add(names[1]),
-	remove(names[0]),
-	add(names[2]),
-	remove(names[1])
-	// remove(names[2])
-];
+const eventLog = {
+	add: names.map((name) => add(name)),
+	remove: names.map((name) => remove(name))
+};
 
-export const generateTeamMemberEvents = () => {
+const addEvents = () => {
 	setInterval(() => {
 		const teamIds: string[] = app.organization.teamList.map((team) => team.id);
-		const event: ActionEvent | undefined = eventLog.shift();
+		const event: ActionEvent | undefined = eventLog.add.shift();
 		if (!event) return;
 		const teamId = getRandom(teamIds);
 		const payload = event.payload as TeamMemberPayload;
@@ -48,5 +45,36 @@ export const generateTeamMemberEvents = () => {
 			return;
 		}
 		team.memberStore.addObj(event);
-	}, 4000);
+	}, 2500);
+};
+
+const removeEvents = () => {
+	setTimeout(() => {
+		setInterval(() => {
+			const teamIds: string[] = app.organization.teamIds;
+			const event: ActionEvent | undefined = eventLog.remove.shift();
+			if (!event) return;
+			const teamId = getRandom(teamIds);
+			const payload = event.payload as TeamMemberPayload;
+			payload.teamId = teamId;
+			const team = app.organization.team(teamId);
+			if (!team) {
+				console.error(`No team: ${teamId}`);
+				return;
+			}
+			const memberIds: string[] = team.memberIds;
+			const id = getRandom(memberIds);
+			event.payload.id = id;
+			team.memberStore.addObj(event);
+		}, 2500);
+	}, 6000);
+};
+
+export const teamMemberEvents = {
+	addEvents,
+	removeEvents,
+	all: () => {
+		addEvents();
+		removeEvents();
+	}
 };

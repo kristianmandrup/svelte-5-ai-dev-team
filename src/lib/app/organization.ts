@@ -1,6 +1,7 @@
 import { createMemberStore, createProjectStore } from '$lib/server/redis';
 import type { RedisStore } from '$lib/stores/redis-store.svelte';
 import { Backlog } from './backlog';
+import type { MemberPayload } from './events/member.events';
 import type { ProjectPayload } from './events/project.events';
 import type { Member } from './member';
 import type { Project } from './project';
@@ -27,6 +28,14 @@ export class Organization extends Storable {
 		return this.projects.get(id);
 	}
 
+	member(id: string) {
+		return this.members.get(id);
+	}
+
+	team(id: string) {
+		return this.teamList.find((team) => team.id === id);
+	}
+
 	get teamList() {
 		return this.projectList.map((proj) => proj.teamList).flat();
 	}
@@ -35,11 +44,20 @@ export class Organization extends Storable {
 		return Array.from(this.projects.values());
 	}
 
-	team(id: string) {
-		const projects = Array.from(this.projects.values());
-		const project = projects.find((proj) => proj.team(id));
-		if (!project) return;
-		return project.team(id);
+	get memberList() {
+		return Array.from(this.members.values());
+	}
+
+	get memberIds() {
+		return this.memberList.map((mem) => mem.id);
+	}
+
+	get teamIds() {
+		return this.teamList.map((team) => team.id);
+	}
+
+	get projectIds() {
+		return this.projectList.map((proj) => proj.id);
 	}
 
 	updateProject(payload: ProjectPayload) {
@@ -53,22 +71,29 @@ export class Organization extends Storable {
 	}
 
 	addProject(project: Project) {
-		this.projects.set(project.id, project);
-		project.publishEvent('add');
+		this.addItem(this.projects, project);
 	}
 
-	removeProject(name: string) {
-		const project = this.byName(this.projects, name);
-		this.remove(this.projects, name);
-		(project as Project).publishEvent('remove');
+	removeProject(id: string) {
+		this.removeItem(this.projects, id);
 	}
 
 	addMember(member: Member) {
-		this.members.set(member.id, member);
+		this.addItem(this.members, member);
+	}
+
+	updateMember(payload: MemberPayload) {
+		const { id, name } = payload;
+		const member = this.member(id);
+		if (!member) {
+			throw new Error(`No such member: ${id}`);
+		}
+		member.name = name;
+		// member.description = description;
 	}
 
 	removeMember(id: string) {
-		this.members.delete(id);
+		this.removeItem(this.members, id);
 	}
 
 	serialize() {

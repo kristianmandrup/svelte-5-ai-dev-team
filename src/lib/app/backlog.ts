@@ -1,5 +1,6 @@
 import { createStore } from '$lib/server/redis';
 import type { RedisStore } from '$lib/stores/redis-store.svelte';
+import type { FeaturePayload } from './events/feature.events';
 import type { Feature } from './feature';
 import { Storable } from './storable';
 
@@ -12,12 +13,25 @@ export class Backlog extends Storable {
 		this.featureStore = createStore('', 'feature');
 	}
 
-	addFeature(feature: Feature) {
-		this.features.set(feature.id, feature);
+	feature(id: string) {
+		return this.features.get(id);
 	}
 
-	removeFeature(name: string) {
-		this.remove(this.features, name);
+	updateFeature(payload: FeaturePayload) {
+		const { id, name } = payload;
+		const feature = this.feature(id);
+		if (!feature) {
+			throw new Error(`No such feature: ${id}`);
+		}
+		feature.name = name;
+	}
+
+	addFeature(feature: Feature) {
+		this.addItem(this.features, feature);
+	}
+
+	removeFeature(id: string) {
+		this.removeItem(this.features, id);
 	}
 
 	get featureList() {
