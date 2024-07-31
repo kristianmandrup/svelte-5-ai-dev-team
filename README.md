@@ -27,28 +27,67 @@ To communicate the messages of the `RedisStore` (in `redis-rune-store.svelte.ts`
 
 ## API
 
-The API includes support for both a polling solution (GET request every 5 secs) and SSEs via ReadableStream.
+The API includes support for both a polling solution (GET request every 5 secs) and SSEs via `ReadableStream`
 
-- `routes/api/messages/+server.ts` - simple GET endpoint that can be used for polling. Subscribes to store and sends messages received back as response
+- `routes/api/messages/+server.ts`
+
+Endpoints:
+
+- `GET` endpoint that can be used for polling. Subscribes to store and sends messages received back as response
+- `POST` endpoint that can be used to update the store with an Application Event
+
+SSE
+
 - `routes/api/sse/+server.ts` - subscribes to store and sends received messages back as a `ReadableStream` (SSE)
+
+## Application Routes
 
 See `routes/projects` folder with examples of client page implementations using both of these approaches.
 
 - `routes/projects/page-sse.svelte` project client page that sets up an `EventSource` to listen to the SSE from the server and handle and display incoming project events
 - `routes/projects/page.svelte` project client page that uses polling to call the GET endpoint every 5 secs to retrieve new project events (messages) to display
 
-SvelteKit now supports SSE natively, as demonstrated in [ReadableStream for SSE](https://github.com/sveltejs/kit/issues/5344#issuecomment-1266398131) and [Full example](https://github.com/sveltejs/kit/issues/5344#issuecomment-2191106238)
+## Testing/Mocking
 
-This pattern is already encapsulated by [sveltekit-sse](https://github.com/razshare/sveltekit-sse) library which makes using SSE much easier!
+The app can generate simulated `ActionEvent`s that are processed by application event handlers to update the application model.
+When the app model is modified, an `AppEvent` is generated that is published via SSE.
+
+In addition several of the pages include forms to generate an `ActionEvent` that is sent to the server API endpoint for processing.
+
+A testing framework can use either of these approaches to simulate and test action events.
+
+## Status
+
+The basic infrastructure is working perfectly. Time to simplify the pages and patterns and encapsulate them so they can be reused without duplication.
+
+## App model
+
+There is now an application model with stores in `src/lib/server/app`. This model can be used to store, maintain and reference application state.
+
+```ts
+import { app } from '$lib/server/app';
+import { produce } from 'sveltekit-sse';
+
+const { projectStore } = app.organization;
+```
+
+Using this approach ensures that the correct store is only created once and referenced/shared everywhere it is used to ensure data consistency in the application.
+
+## Notes on SSE integration
+
+The library [sveltekit-sse](https://github.com/razshare/sveltekit-sse) is used on the server and client to facilitate SSE event communication.
 
 ## Flow pattern
 
 The basic flow can be described as follows:
 
-1. A Redis pubsub channel with application CRUD events for projects
-2. A store subscribes to the pubsub channel and updates messages in the store.
-3. An API subscribes to the store and publishes messages as SSE.
-4. A Client pages listens to the SSE and updates the page.
+1. A Redis pubsub channel with Action CRUD events for each model
+2. A store subscribes to the pubsub channel and updates a Svelte store.
+3. An ActionEvent listener subscribes to the store and calls application event handlers to process the action events.
+4. An event handler updates the app model
+5. The app model triggers an AppEvent which is stored in a Svelte store for app events
+6. An API subscribes to the store and publishes messages as SSE.
+7. A Client pages listens to the SSE and updates the page.
 
 ```mermaid
 graph LR

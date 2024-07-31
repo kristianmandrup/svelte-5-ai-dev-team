@@ -1,40 +1,25 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { createProjectStore } from '$lib/server/redis';
-	import { onDestroy } from 'svelte';
+	import type { PageData } from './$types';
 
-	let { channelName } = $props();
+	// Access the loaded data using $props
+	const { data } = $props<{ data: PageData }>();
 
 	let messages = $state<string[]>([]);
-
-	// get id from path
-	const id = $page.params?.['id'];
-	const teamStore = createProjectStore(id);
-
-	$effect(() => {
-		teamStore.subscribe((value) => {
-			messages = value;
-		});
-
-		onDestroy(() => {
-			teamStore.reset();
-			teamStore.unsubscribe();
-		});
-	});
 </script>
 
 <div>
-	<h1>Project ${id}</h1>
-	<h2>{channelName} Messages</h2>
-	{#if messages.length === 0}
-		<p>No messages yet.</p>
-	{:else}
-		<ul>
-			{#each messages as message}
-				<li>{message}</li>
-			{/each}
-		</ul>
-	{/if}
+	<h1>Project</h1>
+
+	<ul class="project-list">
+		<li class="project-item">{data.name}</li>
+		<li class="project-item">{data.description}</li>
+	</ul>
+
+	<ul class="project-list">
+		{#each data.teams as team}
+			<li class="project-item"><a href="/teams/{team.id}">{team.name}</a></li>
+		{/each}
+	</ul>
 </div>
 
 <style>

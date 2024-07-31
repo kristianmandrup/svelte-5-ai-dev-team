@@ -3,7 +3,7 @@ import type { Toast } from './types';
 
 export class ToastState {
 	toasts = $state<Toast[]>([]);
-	toastToTimeoutMap = new Map<string, number>();
+	toastToTimeoutMap = new Map<string, NodeJS.Timeout>();
 
 	constructor() {
 		onDestroy(() => {
