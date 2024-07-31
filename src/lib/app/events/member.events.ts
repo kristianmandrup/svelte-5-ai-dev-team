@@ -7,7 +7,7 @@ export type MemberPayload = {
 export type AddMemberPayload = MemberPayload;
 
 export type RemoveMemberPayload = {
-	name: string;
+	id: string;
 };
 
 export type TeamMemberPayload = {
@@ -20,5 +20,5 @@ export type AddTeamMemberPayload = TeamMemberPayload;
 
 export type RemoveTeamMemberPayload = {
 	teamId: string;
-	name: string;
+	id: string;
 };

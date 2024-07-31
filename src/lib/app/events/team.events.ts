@@ -12,6 +12,6 @@ export type AddTeamPayload = {
 };
 
 export type RemoveTeamPayload = {
-	projectId: string;
-	name: string;
+	projectId?: string;
+	id: string;
 };

@@ -1,8 +1,7 @@
 import { faker } from '@faker-js/faker';
 import type { ActionEvent } from '../events/event';
-import { app } from '../app';
 import type { TeamMemberPayload } from '../events/member.events';
-import { getRandom, list } from './utils';
+import { getTeam, getTeamMemberId, list } from './utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const names = list(6).map((_) => faker.person.firstName());
@@ -31,43 +30,39 @@ const eventLog = {
 	remove: names.map((name) => remove(name))
 };
 
-const addEvents = () => {
-	setInterval(() => {
-		const teamIds: string[] = app.organization.teamList.map((team) => team.id);
-		const event: ActionEvent | undefined = eventLog.add.shift();
-		if (!event) return;
-		const teamId = getRandom(teamIds);
-		const payload = event.payload as TeamMemberPayload;
-		payload.teamId = teamId;
-		const team = app.organization.team(teamId);
-		if (!team) {
-			console.error(`No team: ${teamId}`);
-			return;
-		}
-		team.memberStore.addObj(event);
-	}, 2500);
-};
-
-const removeEvents = () => {
+const addEvents = (start = 5000, interval = 3000) => {
 	setTimeout(() => {
 		setInterval(() => {
-			const teamIds: string[] = app.organization.teamIds;
-			const event: ActionEvent | undefined = eventLog.remove.shift();
+			const event: ActionEvent | undefined = eventLog.add.shift();
 			if (!event) return;
-			const teamId = getRandom(teamIds);
-			const payload = event.payload as TeamMemberPayload;
-			payload.teamId = teamId;
-			const team = app.organization.team(teamId);
+			const team = getTeam();
 			if (!team) {
-				console.error(`No team: ${teamId}`);
+				console.error(`No team`);
 				return;
 			}
-			const memberIds: string[] = team.memberIds;
-			const id = getRandom(memberIds);
-			event.payload.id = id;
+			const payload = event.payload as TeamMemberPayload;
+			payload.teamId = team.id;
 			team.memberStore.addObj(event);
-		}, 2500);
-	}, 6000);
+		}, interval);
+	}, start);
+};
+
+const removeEvents = (start = 7000, interval = 4000) => {
+	setTimeout(() => {
+		setInterval(() => {
+			const event: ActionEvent | undefined = eventLog.remove.shift();
+			if (!event) return;
+			const team = getTeam();
+			if (!team) {
+				console.error(`No team`);
+				return;
+			}
+			const payload = event.payload as TeamMemberPayload;
+			payload.teamId = team.id;
+			event.payload.id = getTeamMemberId(team);
+			team.memberStore.addObj(event);
+		}, interval);
+	}, start);
 };
 
 export const teamMemberEvents = {

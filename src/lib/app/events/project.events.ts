@@ -10,5 +10,5 @@ export type AddProjectPayload = {
 };
 
 export type RemoveProjectPayload = {
-	name: string;
+	id: string;
 };

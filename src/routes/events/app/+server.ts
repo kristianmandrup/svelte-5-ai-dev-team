@@ -5,10 +5,10 @@ import type { ActionEventHandler } from '$lib/app/events/handlers/event.handler'
 import { projectEventHandler } from '$lib/app/events/handlers/project.event.handler';
 import { teamMemberEventHandler } from '$lib/app/events/handlers/team-member.event.handler';
 import { teamEventHandler } from '$lib/app/events/handlers/team.event.handler';
-import { generateMemberEvents } from '$lib/app/generators';
+import { orgFeatureEvents, orgMemberEvents, teamFeatureEvents } from '$lib/app/generators';
 import { projectEvents } from '$lib/app/generators/project.event.generator';
-import { generateTeamMemberEvents } from '$lib/app/generators/team-member.event.generator';
-import { generateTeamEvents } from '$lib/app/generators/team.event.generator';
+import { teamMemberEvents } from '$lib/app/generators/team-member.event.generator';
+import { teamEvents } from '$lib/app/generators/team.event.generator';
 import { produce } from 'sveltekit-sse';
 
 const appEventStore = app.appEvents;
@@ -61,9 +61,9 @@ export function POST() {
 	});
 }
 
-projectEvents.addEvents();
-projectEvents.removeEvents();
-
-generateTeamEvents();
-generateTeamMemberEvents();
-generateMemberEvents();
+projectEvents.all();
+teamEvents.all();
+teamMemberEvents.all();
+orgMemberEvents.all();
+orgFeatureEvents.all();
+teamFeatureEvents.all();

@@ -13,5 +13,5 @@ export type AddFeaturePayload = {
 
 export type RemoveFeaturePayload = {
 	teamId?: string;
-	name: string;
+	id: string;
 };

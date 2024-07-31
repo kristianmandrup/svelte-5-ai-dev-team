@@ -17,6 +17,14 @@ export class Backlog extends Storable {
 		return this.features.get(id);
 	}
 
+	get featureList() {
+		return Array.from(this.features.values());
+	}
+
+	get featureIds() {
+		return this.featureList.map((feat) => feat.id);
+	}
+
 	updateFeature(payload: FeaturePayload) {
 		const { id, name } = payload;
 		const feature = this.feature(id);
@@ -32,10 +40,6 @@ export class Backlog extends Storable {
 
 	removeFeature(id: string) {
 		this.removeItem(this.features, id);
-	}
-
-	get featureList() {
-		return Array.from(this.features.values());
 	}
 
 	serialize() {

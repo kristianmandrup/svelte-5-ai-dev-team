@@ -1,14 +1,15 @@
 import { faker } from '@faker-js/faker';
 import type { ActionEvent } from '../events/event';
-import { app } from '../app';
-import { getOrgMemberId, list } from './utils';
+import { getFeatureId, getTeam, list } from './utils';
+import type { FeaturePayload } from '../events/feature.events';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const names = list(6).map((_) => faker.person.firstName());
+const names = list(6).map(() => faker.commerce.product());
+
+const model = 'feature';
 
 const add = (name: string): ActionEvent => ({
 	source: 'generator',
-	model: 'member',
+	model,
 	action: 'add',
 	payload: {
 		name,
@@ -18,7 +19,7 @@ const add = (name: string): ActionEvent => ({
 
 const remove = (name: string): ActionEvent => ({
 	source: 'generator',
-	model: 'member',
+	model,
 	action: 'remove',
 	payload: {
 		name
@@ -30,30 +31,43 @@ const eventLog = {
 	remove: names.map((name) => remove(name))
 };
 
-const org = app.organization;
-
-const addEvents = (start = 1000, interval = 3000) => {
+export const addEvents = (start = 6000, interval = 3000) => {
 	setTimeout(() => {
 		setInterval(() => {
 			const event: ActionEvent | undefined = eventLog.add.shift();
 			if (!event) return;
-			org.memberStore.addObj(event);
+			const team = getTeam();
+			if (!team) {
+				console.error(`No team`);
+				return;
+			}
+			const payload = event.payload as FeaturePayload;
+			payload.teamId = team.id;
+			team.backlog.featureStore.addObj(event);
 		}, interval);
 	}, start);
 };
 
-const removeEvents = (start = 6000, interval = 3000) => {
+export const removeEvents = (start = 9000, interval = 4000) => {
 	setTimeout(() => {
 		setInterval(() => {
 			const event: ActionEvent | undefined = eventLog.remove.shift();
 			if (!event) return;
-			event.payload.id = getOrgMemberId();
-			org.memberStore.addObj(event);
+			const team = getTeam();
+			if (!team) {
+				console.error(`No team`);
+				return;
+			}
+			const payload = event.payload as FeaturePayload;
+			payload.teamId = team.id;
+			event.payload.id = getFeatureId(team);
+
+			team.backlog.featureStore.addObj(event);
 		}, interval);
 	}, start);
 };
 
-export const orgMemberEvents = {
+export const teamFeatureEvents = {
 	addEvents,
 	removeEvents,
 	all: () => {
